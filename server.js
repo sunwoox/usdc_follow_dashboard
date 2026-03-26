@@ -13,6 +13,11 @@ let usdcCache = {
 
 app.use(express.static("public"));
 
+// 루트 접속 시 바로 대시보드로 이동
+app.get("/", (req, res) => {
+  res.redirect("/circle_observe01.html");
+});
+
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
@@ -21,7 +26,6 @@ app.get("/api/usdc", async (req, res) => {
   try {
     const now = Date.now();
 
-    // 캐시가 유효하면 CoinGecko를 다시 치지 않음
     if (usdcCache.data && now - usdcCache.fetchedAt < CACHE_TTL_MS) {
       return res.json({
         cached: true,
@@ -58,7 +62,6 @@ app.get("/api/usdc", async (req, res) => {
       });
     }
 
-    // 프론트 기존 형식 유지
     const normalized = {
       data: data.market_caps.map(([time, marketCapUsd]) => ({
         time,
